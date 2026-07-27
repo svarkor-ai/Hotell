@@ -4,7 +4,7 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     APP_NAME: str = "Sea View Hotel"
-    DB_URL: str = "sqlite:///./data/hotel.db"
+    DB_URL: str = "sqlite:///./.data/hotel.db"
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 

@@ -3,8 +3,7 @@ __pycache__/
 *.pyo
 .venv/
 .env
-data/*.db
-*.db
-*.db
-.coverage
+.data/*.db
+.data/*.sqlite
+*.coverage
 htmlcov/
