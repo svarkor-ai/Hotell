@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sea View Hotel — Boka rum med havsvy</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/design-system.css">
 </head>
 <body>
 
@@ -21,20 +22,81 @@
 
 <main>
   <!-- Rooms Page -->
-  <section id="page-rooms">
-    <div class="card">
-      <h2>Våra Rum</h2>
-      <div class="filter-bar">
-        <select id="filter-type">
+  <section id="page-rooms" class="rooms-page">
+
+    <!-- Hero Section -->
+    <section class="rooms-hero">
+      <h1>Våra Rum</h1>
+      <p class="rooms-hero__subtitle">
+        20 rum med havsvy — Välj ditt drömrum
+      </p>
+    </section>
+
+    <!-- Filter & Sort Bar -->
+    <aside class="filter-bar" role="search" aria-label="Rumfilter">
+      <div class="filter-group">
+        <label for="filter-type">Rumtyp</label>
+        <select id="filter-type" class="filter-select">
           <option value="">Alla rumtyper</option>
           <option value="single">Enkel</option>
           <option value="double">Dubbel</option>
           <option value="four_person">Fyrasäng</option>
         </select>
-        <button onclick="loadRooms()"> filtrera</button>
       </div>
-      <div id="rooms-grid" class="room-grid"></div>
-    </div>
+
+      <div class="filter-group">
+        <label for="filter-capacity">Gäster</label>
+        <select id="filter-capacity" class="filter-select">
+          <option value="">Alla</option>
+          <option value="1">1 person</option>
+          <option value="2">2 personer</option>
+          <option value="4">4 personer</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-price">Pris (kr/natt)</label>
+        <select id="filter-price" class="filter-select">
+          <option value="">Alla priser</option>
+          <option value="0-900">Under 900 kr</option>
+          <option value="900-1500">900–1 500 kr</option>
+          <option value="1500-99999">Över 1 500 kr</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sort-by">Sortera</label>
+        <select id="sort-by" class="filter-select">
+          <option value="price-asc">Pris — lägst först</option>
+          <option value="price-desc">Pris — högst först</option>
+          <option value="capacity-desc">Gäster — mest först</option>
+          <option value="room-number">Rumsnummer</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-search">Sök</label>
+        <input
+          type="text"
+          id="filter-search"
+          class="filter-select"
+          placeholder="Sök rum..."
+          aria-label="Sök rum"
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="filter-group filter-actions">
+        <button type="button" class="btn btn-ghost" id="clear-filters" aria-label="Rensa alla filter">
+          ↻ Rensa
+        </button>
+        <span class="filter-count" id="room-count" aria-live="polite"></span>
+      </div>
+    </aside>
+
+    <!-- Room Cards Grid -->
+    <div id="rooms-container" class="rooms-grid" role="region" aria-label="Rum"></div>
+
   </section>
 
   <!-- Bookings Page -->
@@ -79,11 +141,16 @@
     </div>
   </section>
 
+  <!-- Room Detail Modal -->
+  <dialog id="room-detail-dialog" class="room-detail-modal" aria-labelledby="detail-title">
+  </dialog>
+
   <!-- Booking Modal -->
   <div id="booking-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100">
     <div class="card" style="max-width:500px;width:90%;max-height:90vh;overflow-y:auto">
       <h2>Boka <span id="booking-room-label"></span></h2>
-      <form id="booking-form" onsubmit="submitBooking(event)" data-room-id="">
+      <form id="booking-form" onsubmit="submitBooking(event)">
+        <input type="hidden" id="booking-room-id" name="room_id" value="">
         <div class="booking-form">
           <div class="form-group">
             <label>Namn *</label>
@@ -121,6 +188,7 @@
   Sea View Hotel · Lokalt prototyp-projekt · 26 rum med havsvy
 </footer>
 
+<script src="/static/js/rooms.js"></script>
 <script src="/static/js/app.js"></script>
 </body>
 </html>

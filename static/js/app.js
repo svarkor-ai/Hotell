@@ -18,36 +18,9 @@ function showPage(page) {
   const target = document.getElementById(`page-${page}`);
   if (target) {
     target.classList.remove('hidden');
-    if (page === 'rooms') loadRooms();
+    if (page === 'rooms') initRooms();
     if (page === 'bookings') loadBookings();
     if (page === 'calendar') loadMonthCalendar();
-  }
-}
-
-// --- Rooms ---
-async function loadRooms() {
-  const typeFilter = document.getElementById('filter-type')?.value || '';
-  try {
-    const url = typeFilter ? `/api/rooms/?sea_view_only=false&room_type=${typeFilter}` : '/api/rooms/';
-    const res = await fetch(API + '/api/rooms/');
-    const rooms = await res.json();
-    const grid = document.getElementById('rooms-grid');
-    grid.innerHTML = rooms.map(r => `
-      <div class="room-card">
-        <div class="room-img">🌊</div>
-        <div class="room-info">
-          <h3>Room ${r.room_number} <span class="sea-badge">Havsvy</span></h3>
-          <div class="type">${r.room_type} · ${r.capacity} personer</div>
-          <div class="price">${r.price_per_night} kr <span>/ natt</span></div>
-          ${r.description ? `<p style="margin-top:0.5rem;font-size:0.85rem;color:#64748b">${r.description}</p>` : ''}
-          <button class="btn btn-primary" style="margin-top:0.75rem;width:100%" onclick="openBooking(${r.id}, '${r.room_number}')">
-            Boka nu
-          </button>
-        </div>
-      </div>
-    `).join('');
-  } catch (err) {
-    console.error('Failed to load rooms:', err);
   }
 }
 
@@ -74,8 +47,10 @@ async function submitBooking(e) {
     check_out: form.check_out.value,
   };
 
+  const roomId = document.getElementById('booking-room-id').value;
+
   try {
-    const res = await fetch(`/api/rooms/${form.dataset.roomId}/book`, {
+    const res = await fetch(`/api/rooms/${roomId}/book`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -167,7 +142,12 @@ function showMessage(text, type) {
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
-  showPage('rooms');
-  document.getElementById('page-rooms').classList.remove('hidden');
+  // Initialize rooms page (from rooms.js)
+  if (typeof initRooms === 'function') {
+    initRooms();
+  } else {
+    showPage('rooms');
+    document.getElementById('page-rooms').classList.remove('hidden');
+  }
   document.querySelector('nav a[data-page="rooms"]').classList.add('active');
 });
