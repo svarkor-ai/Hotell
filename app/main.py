@@ -18,6 +18,9 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.APP_NAME, version="0.1.0")
 
+# Serve static files (CSS, JS, images)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 app.include_router(rooms_router)
 app.include_router(bookings_router)
 app.include_router(calendar_router)
