@@ -21,7 +21,9 @@
 </nav>
 
 <main>
-  <!-- Rooms Page -->
+  <!-- ============================== -->
+  <!-- Rooms Page                       -->
+  <!-- ============================== -->
   <section id="page-rooms" class="rooms-page">
 
     <!-- Hero Section -->
@@ -99,89 +101,180 @@
 
   </section>
 
-  <!-- Bookings Page -->
+  <!-- ============================== -->
+  <!-- Bookings Page                    -->
+  <!-- ============================== -->
   <section id="page-bookings" class="hidden">
-    <div class="card">
-      <h2>Aktiva Bokningar</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Gäst</th>
-              <th>Incheckning</th>
-              <th>Utcheckning</th>
-              <th>Pris</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="bookings-tbody"></tbody>
-        </table>
+    <div class="bookings-page">
+
+      <!-- Header -->
+      <div class="bookings-page__header">
+        <h2 class="bookings-page__title">Bokningar</h2>
+        <span class="bookings-page__count" id="booking-count" aria-live="polite">Laddar...</span>
+      </div>
+
+      <!-- Filter Bar -->
+      <aside class="filter-bar filter-bar--bookings" role="search" aria-label="Bokningsfilter">
+        <div class="filter-group">
+          <label for="filter-status">Status</label>
+          <select id="filter-status" class="filter-select form-select">
+            <option value="">Alla statusar</option>
+            <option value="confirmed">Bekräftad</option>
+            <option value="cancelled">Avbruten</option>
+            <option value="completed">Slutförd</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-date-from">Från datum</label>
+          <input type="date" id="filter-date-from" class="form-input" aria-label="Från datum">
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-date-to">Till datum</label>
+          <input type="date" id="filter-date-to" class="form-input" aria-label="Till datum">
+        </div>
+
+        <div class="filter-group filter-actions">
+          <button type="button" class="btn btn-ghost" id="clear-bookings-filter" aria-label="Rensa filter">
+            ↻ Rensa filter
+          </button>
+        </div>
+      </aside>
+
+      <!-- Data Table -->
+      <div class="card card--bookings">
+        <div id="bookings-loading" class="bookings-loading" hidden aria-live="polite">
+          <p class="bookings-loading__text">Laddar bokningar...</p>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table table--bookings" id="bookings-table" role="grid" aria-label="Bokningar">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort-key="id" scope="col">ID</th>
+                <th class="sortable" data-sort-key="guest" scope="col">Gäst</th>
+                <th class="sortable" data-sort-key="room" scope="col">Rum</th>
+                <th class="sortable" data-sort-key="date" scope="col">Datum</th>
+                <th class="sortable" data-sort-key="price" scope="col">Pris</th>
+                <th class="sortable" data-sort-key="status" scope="col">Status</th>
+                <th scope="col">Åtgärd</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-tbody" role="rowgroup"></tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="bookings-empty" class="bookings-empty" hidden role="status">
+          <div class="bookings-empty__icon" aria-hidden="true">📋</div>
+          <h3 class="bookings-empty__title">Inga bokningar hittades</h3>
+          <p class="bookings-empty__text">Det finns inga bokningar som matchar dina filter.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Calendar Page -->
+  <!-- ============================== -->
+  <!-- Calendar Page                    -->
+  <!-- ============================== -->
   <section id="page-calendar" class="hidden">
-    <div class="card">
-      <h2>Bokningskalender</h2>
-      <div class="filter-bar">
-        <select id="cal-month">
-          <option value="1">Januari</option><option value="2">Februari</option>
-          <option value="3">Mars</option><option value="4">April</option>
-          <option value="5">Maj</option><option value="6">Juni</option>
-          <option value="7">Juli</option><option value="8">Augusti</option>
-          <option value="9">September</option><option value="10">Oktober</option>
-          <option value="11">November</option><option value="12">December</option>
-        </select>
-        <input type="number" id="cal-year" value="2026" min="2024" max="2030">
-        <button onclick="loadMonthCalendar()">Visa kalender</button>
+    <div class="calendar-page">
+
+      <!-- Header -->
+      <div class="calendar-page__header">
+        <h2 class="calendar-page__title">Bokningskalender</h2>
+        <span class="calendar-page__count" id="calendar-month-label" aria-live="polite"></span>
       </div>
-      <div id="calendar-container" class="calendar-grid"></div>
+
+      <!-- Controls Bar -->
+      <aside class="filter-bar filter-bar--calendar" role="toolbar" aria-label="Kalenderkontroller">
+        <div class="filter-group">
+          <button type="button" class="btn btn-secondary btn-sm" id="cal-prev-month" aria-label="Föregående månad">
+            ‹ Föregående
+          </button>
+        </div>
+
+        <div class="filter-group">
+          <button type="button" class="btn btn-primary" id="cal-today" aria-label="Gå till dagens månad">
+            ☰ Idag
+          </button>
+        </div>
+
+        <div class="filter-group">
+          <button type="button" class="btn btn-secondary btn-sm" id="cal-next-month" aria-label="Nästa månad">
+            Nästa ›
+          </button>
+        </div>
+
+        <div class="filter-group" style="margin-left:auto;">
+          <label for="filter-room-type">Rumtyp</label>
+          <select id="filter-room-type" class="filter-select form-select">
+            <option value="">Alla rumtyper</option>
+            <option value="single">Enkel</option>
+            <option value="double">Dubbel</option>
+            <option value="four_person">Fyrasäng</option>
+          </select>
+        </div>
+      </aside>
+
+      <!-- Calendar Grid -->
+      <div class="card card--calendar">
+        <div class="table-wrap table-wrap--calendar" id="calendar-grid-wrapper">
+          <div class="calendar-grid" id="calendar-weeks" role="grid" aria-label="Kalender">
+            <!-- Calendar grid rendered by calendar.js -->
+          </div>
+        </div>
+
+        <!-- Room Legend -->
+        <div class="calendar-legend" id="calendar-room-legend" role="list" aria-label="Rum">
+          <!-- Room legend rendered by calendar.js -->
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Room Detail Modal -->
+  <!-- ============================== -->
+  <!-- Room Detail Modal                -->
+  <!-- ============================== -->
   <dialog id="room-detail-dialog" class="room-detail-modal" aria-labelledby="detail-title">
   </dialog>
 
-  <!-- Booking Modal -->
-  <div id="booking-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100">
-    <div class="card" style="max-width:500px;width:90%;max-height:90vh;overflow-y:auto">
-      <h2>Boka <span id="booking-room-label"></span></h2>
-      <form id="booking-form" onsubmit="submitBooking(event)">
-        <input type="hidden" id="booking-room-id" name="room_id" value="">
-        <div class="booking-form">
-          <div class="form-group">
-            <label>Namn *</label>
-            <input name="guest_name" required>
-          </div>
-          <div class="form-group">
-            <label>E-post *</label>
-            <input name="guest_email" type="email" required>
-          </div>
-          <div class="form-group">
-            <label>Telefon</label>
-            <input name="guest_phone">
-          </div>
-          <div class="form-group">
-            <label>Incheckning *</label>
-            <input name="check_in" type="date" required>
-          </div>
-          <div class="form-group">
-            <label>Utcheckning *</label>
-            <input name="check_out" type="date" required>
-          </div>
-        </div>
-        <div style="margin-top:1.25rem;display:flex;gap:0.75rem">
-          <button type="submit" class="btn btn-primary">Bekräfta bokning</button>
-          <button type="button" class="btn" onclick="closeBooking()" style="background:#e5e7eb">Avbryt</button>
-        </div>
-      </form>
+  <!-- ============================== -->
+  <!-- Booking Flow Modal               -->
+  <!-- ============================== -->
+  <div id="booking-modal" class="booking-modal hidden" role="dialog" aria-modal="true" aria-label="Boka rum">
+    <div class="booking-modal__content" id="booking-modal-body">
+      <!-- Default state — form rendered by booking-flow.js -->
+      <div class="booking-form__header">
+        <h3 class="booking-form__title">Boka Rum</h3>
+        <p class="booking-form__subtitle">Välj datum och fyll i uppgifter</p>
+      </div>
     </div>
   </div>
 
-  <div id="message-box"></div>
+  <!-- ============================== -->
+  <!-- Cancel Confirmation Dialog       -->
+  <!-- ============================== -->
+  <dialog id="cancel-confirm-dialog" class="cancel-dialog" aria-labelledby="cancel-title">
+    <div class="cancel-dialog__content">
+      <h3 id="cancel-title" class="cancel-dialog__title">Avbryt bokning</h3>
+      <p id="cancel-detail" class="cancel-dialog__text"></p>
+      <div class="cancel-dialog__actions">
+        <button type="button" class="btn btn-danger" id="confirm-cancel-btn">Ja, avbryt</button>
+        <button type="button" class="btn btn-secondary" id="cancel-dialog-btn">Avbryt</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ============================== -->
+  <!-- Toast Notifications              -->
+  <!-- ============================== -->
+  <div id="toast-notification" class="toast toast--info hidden" role="alert" aria-live="assertive">
+    <span class="toast__message" id="toast-message"></span>
+    <button type="button" class="toast__close" id="toast-close-btn" aria-label="Stäng">✕</button>
+  </div>
+
 </main>
 
 <footer>
@@ -189,6 +282,9 @@
 </footer>
 
 <script src="/static/js/rooms.js"></script>
+<script src="/static/js/bookings.js"></script>
+<script src="/static/js/calendar.js"></script>
+<script src="/static/js/booking-flow.js"></script>
 <script src="/static/js/app.js"></script>
 </body>
 </html>
