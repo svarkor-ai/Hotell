@@ -1,0 +1,32 @@
+=== T2 Gate Evidence: Rooms Page ===
+
+1. CSS Token Mismatch — FIXED (2026-07-28)
+   - style.css had 19 tokens not in design-system.css
+   - Mapped all tokens: --color-background→--color-surface, --color-surface-100→--color-neutral-50, etc.
+   - 64 replacements applied across 741 lines
+   - Verified: 0 missing tokens remain
+   - Committed: 1c92190
+
+2. Visual Verification (browser_navigate + browser_snapshot):
+   - GET http://localhost:3343/ → 200 OK
+   - Title: "Sea View Hotel — Boka rum med havsvy"
+   - Navigation: Rum, Bokningar, Kalender (all 3 links present)
+   - Filter bar: room type, capacity, price, sort, search (all present)
+   - Room count: "Visar 20 rum"
+   - 20 room cards rendered with:
+     - Room number (Room 101-321)
+     - Room type (single/double/four_person)
+     - Capacity (1/2/4 persons)
+     - Price per night (800-2200 kr)
+     - "Boka Room XXX" CTA button on each
+   - Room types distribution: 6 single, 8 double, 6 four_person ✓
+
+3. API Verification:
+   - GET http://localhost:3343/api/rooms/ → 200 OK (JSON array of rooms)
+   - Static files serving: CSS/JS all load without 404
+
+4. Design System Compliance:
+   - All var(--token) references in style.css map to valid design-system tokens
+   - No undefined custom properties
+
+VERIFY_EXIT=0

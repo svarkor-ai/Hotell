@@ -1,0 +1,21 @@
+✓ Health: {"status":"ok","app":"Sea View Hotel"}
+✓ Homepage 200: 200
+✓ CSS:DS: 200
+✓ CSS:Style: 200
+✓ JS:app.js: 200
+✓ JS:rooms.js: 200
+✓ JS:bookings.js: 200
+✓ JS:calendar.js: 200
+✓ JS:booking-flow.js: 200
+✓ API:20 Rooms: 20 rooms
+✓ API:Distribution: {'single': 6, 'double': 8, 'four_person': 6}
+✓ API:Create Booking: id=3
+✓ API:Bookings: 3 bookings
+✓ API:Calendar: days=31
+✓ CSS Tokens: 0 missing
+✓ HTML:Title: 10851 chars
+✓ HTML:3 Pages: rooms=True,bk=True,cal=True
+✓ HTML:Nav: nav=True
+
+PASSED: 18/18
+VERIFY_EXIT=0

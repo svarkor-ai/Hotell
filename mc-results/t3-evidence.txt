@@ -1,0 +1,25 @@
+=== T3 Gate Evidence: Bookings + Calendar + Booking Flow ===
+
+1. Backend Routers:
+   - app/routers/bookings.py: CRUD for bookings (GET/POST/PUT/DELETE)
+   - app/routers/calendar.py: Calendar availability per room/month
+   - All routes under /api/bookings, /api/calendar prefixes
+
+2. Frontend JS:
+   - static/js/bookings.js (12,187 bytes) — bookings table, filtering, sorting
+   - static/js/calendar.js (10,713 bytes) — calendar grid rendering
+   - static/js/booking-flow.js (16,853 bytes) — booking form modal, guest info
+
+3. API Verification:
+   - GET /api/rooms/ → 200 OK, 20 rooms
+   - GET /api/bookings/ → 200 OK, 1 booking (test data)
+   - GET /api/calendar/2025/7/rooms/1 → 200 OK, calendar data returned
+   - Server health: OK
+
+4. Integration:
+   - All 3 JS files loaded in index.html
+   - Booking form has: guest_name, guest_email, check_in, check_out
+   - Cancel confirmation dialog present
+   - Toast notification system present
+
+VERIFY_EXIT=0

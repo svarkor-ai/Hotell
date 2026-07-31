@@ -567,10 +567,32 @@ table {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.room-card__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.room-card__img:not([src=""]),
+.room-card__img[src] {
+  display: block;
+}
+
+.room-card__img[src]:not(:src-error) + .room-card__image-icon {
+  display: none;
 }
 
 .room-card__image-icon {
   font-size: 2.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .room-card__content {
@@ -1244,9 +1266,116 @@ table {
 
   /* Room card image taller */
   .room-card__image {
-    height: 200px;
+    height: 180px;
   }
 }
+
+/* ============================================================
+    Dark Mode Base Styles
+    ============================================================ */
+  body.dark-mode {
+   --color-bg-primary: #1a1a2e;
+   --color-bg-secondary: #16213e;
+   --color-bg-tertiary: #0f3460;
+   --color-bg-card: #16213e;
+   --color-bg-input: #0f3460;
+   --color-text-primary: #e2e8f0;
+   --color-text-secondary: #94a3b8;
+   --color-text-muted: #64748b;
+   --color-border: #334155;
+   --color-border-hover: #475569;
+   --color-surface-overlay: rgba(15, 52, 96, 0.95);
+  }
+
+  body.dark-mode .room-card {
+   background: var(--color-bg-card);
+   border-color: var(--color-border);
+  }
+
+  body.dark-mode .room-card:hover {
+   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  body.dark-mode .booking-card {
+   background: var(--color-bg-card);
+   border-color: var(--color-border);
+  }
+
+  body.dark-mode .table-wrap {
+   background: var(--color-bg-card);
+   border-color: var(--color-border);
+  }
+
+  body.dark-mode .filter-select,
+  body.dark-mode .form-input,
+  body.dark-mode .form-select {
+   background: var(--color-bg-input);
+   color: var(--color-text-primary);
+   border-color: var(--color-border);
+  }
+
+  body.dark-mode .filter-select:focus,
+  body.dark-mode .form-input:focus,
+  body.dark-mode .form-select:focus {
+   border-color: var(--color-primary-500);
+   box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+  }
+
+  body.dark-mode .card,
+  body.dark-mode .card--calendar,
+  body.dark-mode .card--bookings {
+   background: var(--color-bg-card);
+   border-color: var(--color-border);
+  }
+
+  body.dark-mode .calendar-grid {
+   background: var(--color-bg-card);
+  }
+
+  body.dark-mode .calendar-day,
+  body.dark-mode .calendar-weekday {
+   background: var(--color-bg-card);
+   border-color: var(--color-border);
+   color: var(--color-text-primary);
+  }
+
+  body.dark-mode .calendar-day:hover {
+   background: var(--color-bg-tertiary);
+  }
+
+  body.dark-mode .calendar-day.is-today {
+   border-color: var(--color-primary-400);
+   background: var(--color-bg-tertiary);
+  }
+
+  body.dark-mode .calendar-day.is-booked {
+   background: var(--color-error-100);
+  }
+
+  body.dark-mode .room-detail-modal,
+  body.dark-mode .booking-modal {
+   background: var(--color-bg-card);
+   border-color: var(--color-border);
+   color: var(--color-text-primary);
+  }
+
+  body.dark-mode .room-detail-modal::backdrop,
+  body.dark-mode .booking-modal-backdrop {
+   background: rgba(0, 0, 0, 0.7);
+  }
+
+  body.dark-mode .site-hero__content {
+   color: #fff;
+  }
+
+  body.dark-mode .site-hero__subtitle {
+   color: #cbd5e1;
+  }
+
+  body.dark-mode .dark-mode-toggle {
+   color: #fbbf24;
+  }
+ 
 
 /* ---- XL (≥1280px) ---- */
 @media (min-width: 1280px) {

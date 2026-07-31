@@ -199,12 +199,14 @@ function renderRoomCard(room) {
     ? '1 person'
     : `${room.capacity} personer`;
 
+  const imgPath = `/static/images/rooms/${room.room_type}-room.jpg`;
   return `
     <article class="room-card" role="button" tabindex="0"
              data-room-id="${room.id}"
              aria-label="Rum ${escapeHtml(room.room_number)}, ${typeLabel}, ${capacityLabel}, ${formatPrice(room.price_per_night)}"
              style="border-top: 4px solid ${typeColor};">
       <div class="room-card__image" style="background: linear-gradient(135deg, ${typeColor}40 0%, ${typeColor}80 50%, ${typeColor} 100%);">
+        <img src="${imgPath}" alt="${typeLabel} rum med havsvy — Room ${escapeHtml(room.room_number)}" loading="lazy" onerror="this.style.display='none';this.parentElement.style.backgroundSize='cover';" class="room-card__img">
         <span class="room-card__image-icon" aria-hidden="true">🌊</span>
         <span class="room-card__badge room-card__badge--sea-view" aria-label="Havsvy">🏖 Havsvy</span>
         <span class="room-card__badge room-card__badge--room-number"># ${escapeHtml(room.room_number)}</span>
@@ -355,8 +357,11 @@ function openRoomDetail(room) {
       </div>
     `).join('');
 
+  const imgPath = `/static/images/rooms/${room.room_type}-room.jpg`;
+
   dialog.innerHTML = `
     <div class="room-detail__image" style="background: linear-gradient(135deg, ${typeColor}40 0%, ${typeColor}80 50%, ${typeColor} 100%);">
+      <img src="${imgPath}" alt="${typeLabel} rum med havsvy — Room ${escapeHtml(room.room_number)}" class="room-detail__img" onerror="this.style.display='none';">
       <div class="room-detail__image-nav">
         <span style="font-size: 2rem; opacity: 0.6;" aria-hidden="true">🌊</span>
       </div>

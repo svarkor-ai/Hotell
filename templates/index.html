@@ -20,6 +20,17 @@
   <a data-page="calendar" href="#">Kalender</a>
 </nav>
 
+<!-- Hero Section -->
+<section id="site-hero" class="site-hero">
+  <img src="/static/images/rooms/hotel-exterior.jpg" alt="Sea View Hotel — hotellbyggnad med havsutsikt" class="site-hero__bg" onerror="this.parentElement.style.background='linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #06b6d4 100%)'">
+  <div class="site-hero__overlay"></div>
+  <div class="site-hero__content">
+    <h2 class="site-hero__title">Sea View Hotel</h2>
+    <p class="site-hero__subtitle">Din semester börjar här — rum med havsvy direkt vid kusten</p>
+    <a href="#" class="btn btn-hero site-hero__cta" data-page="rooms">Utforska våra rum</a>
+  </div>
+</section>
+
 <main>
   <!-- ============================== -->
   <!-- Rooms Page                       -->
@@ -277,8 +288,33 @@
 
 </main>
 
-<footer>
-  Sea View Hotel · Lokalt prototyp-projekt · 26 rum med havsvy
+<!-- Dark Mode Toggle -->
+<button class="dark-mode-toggle" id="dark-mode-toggle" aria-label="Växla mörkt läge" title="Växla mörkt läge">🌙</button>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__section">
+      <h4>Sea View Hotel</h4>
+      <p>Rum med havsvy direkt vid kusten</p>
+      <p>26 rum • 3 rumtyper • Året runt öppet</p>
+    </div>
+    <div class="site-footer__section">
+      <h4>Kontakt</h4>
+      <p>📞 +46 70 123 4567</p>
+      <p>📧 info@seaviewhotel.local</p>
+      <p>📍 Kustvägen 1, Sverige</p>
+    </div>
+    <div class="site-footer__section">
+      <h4>Länkar</h4>
+      <a href="#" data-page="rooms">Rum</a><br>
+      <a href="#" data-page="bookings">Bokningar</a><br>
+      <a href="#" data-page="calendar">Kalender</a>
+    </div>
+  </div>
+  <div class="site-footer__bottom">
+    Lokalt prototyp-projekt · Sea View Hotel © 2026
+  </div>
 </footer>
 
 <script src="/static/js/rooms.js"></script>

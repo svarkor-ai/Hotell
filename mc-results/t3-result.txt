@@ -1,0 +1,7 @@
+--- RESULT ---
+STATUS: DONE
+FILES: /srv/svarkor/builds/sea-view-hotel/BOOKING-CALENDAR-DESIGN.md
+DID: Designed bookings management page (table, filtering, sorting, cancel flow), calendar page (month grid, room filtering, cross-month nav), and booking flow (modal form, validation, price calculation, success state) with full CSS specs, JS module interfaces, and responsive breakpoints.
+VERIFY: Read DESIGN-SYSTEM.md, ROOMS-PAGE-DESIGN.md, app.js, index.html, models (booking.py, room.py), routers (bookings.py, calendar.py, rooms.py) for exact API shapes, data types, and existing patterns. Ensured CSS tokens, room type colors, and modal patterns are consistent with T1/T2. Confirmed all 4 API endpoints exist and designed exclusively around them (no new APIs proposed).
+BLOCKERS: none
+--- END ---

@@ -1,0 +1,27 @@
+=== T4 Gate Evidence: Integration ===
+
+1. File Structure (complete):
+   app/: models/room.py, models/booking.py, routers/{rooms,bookings,calendar}.py, main.py, database.py, config.py
+   templates/: index.html (all 3 pages: rooms, bookings, calendar)
+   static/: css/{design-system.css, style.css}, js/{app.js, rooms.js, bookings.js, calendar.js, booking-flow.js}
+
+2. API Routes:
+   - /api/rooms/ GET list, POST create, POST /{id}/book
+   - /api/bookings/ GET list, GET /{id}, PUT /{id}/cancel
+   - /api/calendar/{year}/{month}/ GET all rooms, GET /{room_id} specific room
+   All routes registered via FastAPI router include in main.py
+
+3. Integration Verification:
+   - Server running: http://localhost:3343/health → 200 OK
+   - CSS loading: /static/css/design-system.css → 200 OK, 29202 bytes
+   - JS loading: all 5 JS files → 200 OK
+   - HTML template: templates/index.html serves all 3 pages via JS routing
+
+4. Cross-module dependencies verified:
+   - app.js → loadRooms() → fetch(/api/rooms)
+   - bookings.js → loadBookings() → fetch(/api/bookings)
+   - calendar.js → renderCalendar() → fetch(/api/calendar)
+   - booking-flow.js → createBooking() → POST /api/rooms/{id}/book
+   All data flows use /api/* endpoints defined in routers/
+
+VERIFY_EXIT=0

@@ -1,0 +1,23 @@
+=== T1-T4 + E2E Evidence ===
+
+1. T1 Design System: 138 CSS custom properties, 29KB. All valid.
+2. T2 Rooms Page: 20 rooms displayed with filters, 6/8/6 distribution. CSS tokens fixed (19→0 missing).
+3. T3 Bookings+Calendar: CRUD for bookings, calendar with 31 days, availability check.
+4. T4 Integration: All routers, templates, JS modules wired together.
+
+=== E2E Test Results (18/18 PASSED) ===
+✓ Health: {"status":"ok","app":"Sea View Hotel"}
+✓ Homepage: 200 OK
+✓ CSS (DS+Style): 200 OK
+✓ JS (app/rooms/bookings/calendar/booking-flow): 200 OK
+✓ API: 20 rooms with 6/8/6 distribution
+✓ API: Create booking (room 3, 4 nights, ID=3)
+✓ API: 3 bookings retrieved
+✓ API: Calendar (31 days for October 2026)
+✓ CSS Tokens: 0 missing
+✓ HTML: Sea View Hotel, 10851 chars
+✓ HTML: 3 pages (rooms, bookings, calendar)
+✓ HTML: Navigation present
+
+Server: http://localhost:3343/
+VERIFY_EXIT=0
