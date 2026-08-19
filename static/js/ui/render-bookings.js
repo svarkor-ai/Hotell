@@ -1,11 +1,10 @@
 /**
- * bookings.js — Bookings Management Page
+ * render-bookings.js — Bookings Management Page
  *
  * Provides a data table for viewing, filtering, sorting, and cancelling
  * hotel bookings. Follows BEM naming and uses design-system.css tokens.
  */
 
-/* global API */
 const bookingsModule = (() => {
   // ---- State ----
   let allBookings = [];
@@ -22,8 +21,7 @@ const bookingsModule = (() => {
   // ---- API ----
   async function fetchBookings() {
     try {
-      const res = await fetch(`${API}/api/bookings/`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await apiGet(Endpoints.bookings);
       return await res.json();
     } catch (err) {
       console.error('Failed to load bookings:', err);
@@ -33,7 +31,7 @@ const bookingsModule = (() => {
 
   async function cancelBooking(id) {
     try {
-      const res = await fetch(`${API}/api/bookings/${id}/cancel`, { method: 'PUT' });
+      const res = await fetch(API_BASE + Endpoints.cancel(id), { method: 'PUT' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (err) {
@@ -167,30 +165,6 @@ const bookingsModule = (() => {
         showCancelConfirm(id);
       });
     });
-  }
-
-  // ---- Rendering: Skeleton Loading ----
-  function renderSkeletonLoading(container) {
-    const loadingEl = document.getElementById('bookings-loading');
-    const tbody = document.getElementById('bookings-tbody');
-    const emptyEl = document.getElementById('bookings-empty');
-
-    if (tbody) tbody.innerHTML = '';
-    if (emptyEl) emptyEl.hidden = true;
-    if (loadingEl) {
-      loadingEl.hidden = false;
-      loadingEl.innerHTML = Array.from({ length: 6 }, () => `
-        <div class="skeleton-row">
-          <div class="skeleton-row__cell skeleton-row__cell--short"></div>
-          <div class="skeleton-row__cell skeleton-row__cell--long"></div>
-          <div class="skeleton-row__cell skeleton-row__cell--short"></div>
-          <div class="skeleton-row__cell skeleton-row__cell--medium"></div>
-          <div class="skeleton-row__cell skeleton-row__cell--short"></div>
-          <div class="skeleton-row__cell skeleton-row__cell--short"></div>
-          <div class="skeleton-row__cell skeleton-row__cell--short"></div>
-        </div>
-      `).join('');
-    }
   }
 
   // ---- Rendering: Update count ----

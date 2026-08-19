@@ -1,0 +1,201 @@
+/* ---- 3.1 Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-tight);
+  text-align: center;
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: var(--space-0-5) var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.btn-base {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-base);
+}
+
+.btn-lg {
+  padding: var(--space-3) var(--space-8);
+  font-size: var(--text-lg);
+}
+
+/* Button Variants */
+.btn-primary {
+  background: var(--color-primary-600);
+  color: var(--color-text-inverse);
+}
+.btn-primary:hover {
+  background: var(--color-primary-700);
+}
+.btn-primary:active {
+  background: var(--color-primary-800);
+}
+
+.btn-secondary {
+  background: var(--color-neutral-200);
+  color: var(--color-text);
+}
+.btn-secondary:hover {
+  background: var(--color-neutral-300);
+}
+.btn-secondary:active {
+  background: var(--color-neutral-400);
+}
+
+.btn-success {
+  background: var(--color-accent-600);
+  color: var(--color-text-inverse);
+}
+.btn-success:hover {
+  background: var(--color-accent-700);
+}
+.btn-success:active {
+  background: var(--color-accent-800);
+}
+
+.btn-danger {
+  background: var(--color-error);
+  color: var(--color-text-inverse);
+}
+.btn-danger:hover {
+  background: #b91c1c;
+}
+.btn-danger:active {
+  background: #991b1b;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-primary-600);
+  border: 1px solid var(--color-primary-600);
+}
+.btn-outline:hover {
+  background: var(--color-primary-50);
+  border-width: 2px;
+  padding: calc(var(--space-2) - 1px) calc(var(--space-4) - 1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-muted);
+}
+.btn-ghost:hover {
+  background: var(--color-neutral-100);
+}
+
+/* Disabled state */
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Button icon */
+.btn__icon {
+  font-size: 1.1em;
+}
+.btn__icon--end {
+  order: 1;
+}
+
+.btn {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary { background: #0369a1; color: white; }
+.btn-primary:hover { background: #075985; }
+.btn-danger { background: #dc2626; color: white; }
+.btn-danger:hover { background: #b91c1c; }
+
+/* Dark mode toggle */
+.dark-mode-toggle {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast) ease;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+}
+
+.dark-mode-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-xl);
+}
+
+/* ============================================================
+   Dark Mode Toggle
+   ============================================================ */
+.dark-mode-toggle {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: 100;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-primary-600);
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark-mode-toggle:hover {
+  background: var(--color-primary-700);
+  transform: scale(1.1);
+  box-shadow: var(--shadow-lg);
+}
+
+.dark-mode-toggle:active {
+  transform: scale(0.95);
+}
+
+body.dark-mode .dark-mode-toggle {
+  background: var(--color-warm-500);
+}
+
+body.dark-mode .dark-mode-toggle:hover {
+  background: var(--color-warm-600);
+}
+
+  body.dark-mode .dark-mode-toggle {
+   color: #fbbf24;
+  }

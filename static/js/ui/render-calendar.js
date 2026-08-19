@@ -1,11 +1,13 @@
 /**
- * calendar.js — Calendar Page (Month Grid View)
+ * render-calendar.js — Calendar Page (Month Grid View)
  *
  * Renders a month calendar grid showing room availability for each day.
  * Supports month navigation, room type filtering, and today highlighting.
+ *
+ * Depends on: utils/api.js (API_BASE, apiGet, Endpoints)
  */
 
-/* global API */
+/* global API_BASE, apiGet, Endpoints */
 const calendarModule = (() => {
   // ---- State ----
   let currentYear = new Date().getFullYear();
@@ -31,7 +33,7 @@ const calendarModule = (() => {
   // ---- API ----
   async function fetchCalendar(year, month) {
     try {
-      const res = await fetch(`/api/calendar/${year}/${month}`);
+      const res = await apiGet(Endpoints.calendar(year, month));
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (err) {
@@ -43,7 +45,7 @@ const calendarModule = (() => {
   async function fetchRooms() {
     if (roomsLoaded) return rooms;
     try {
-      const res = await fetch(`${API}/api/rooms/`);
+      const res = await apiGet(Endpoints.rooms);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       rooms = await res.json();
       roomsLoaded = true;
@@ -72,8 +74,8 @@ const calendarModule = (() => {
   function isToday(year, month, day) {
     const now = new Date();
     return now.getFullYear() === year &&
-           now.getMonth() + 1 === month &&
-           now.getDate() === day;
+          now.getMonth() + 1 === month &&
+          now.getDate() === day;
   }
 
   function isPrevMonthDay(year, month, day) {

@@ -1,5 +1,5 @@
 /**
- * rooms.js — Rooms Page UI Module
+ * render-rooms.js — Rooms Page UI Module
  *
  * Handles room listing, filtering, sorting, and detail modal for
  * Sea View Hotel's rooms page. Uses vanilla JS — no framework.
@@ -162,28 +162,6 @@ function sortRooms(rooms, criteria) {
 }
 
 // ============================================================
-// Render: Skeleton Loading State
-// ============================================================
-
-function renderSkeletons() {
-  // Show 6 skeleton cards
-  gridContainer.innerHTML = '';
-  const skeletonHTML = Array.from({ length: 6 }, () => `
-    <article class="skeleton-card">
-      <div class="skeleton-card__image"></div>
-      <div class="skeleton-card__content">
-        <div class="skeleton-line skeleton-line--title"></div>
-        <div class="skeleton-line skeleton-line--meta"></div>
-        <div class="skeleton-line skeleton-line--desc"></div>
-        <div class="skeleton-line skeleton-line--price"></div>
-      </div>
-    </article>
-  `).join('');
-  gridContainer.innerHTML = skeletonHTML;
-  updateRoomCount(''); // hide count during loading
-}
-
-// ============================================================
 // Render: Room Card
 // ============================================================
 
@@ -260,58 +238,6 @@ function renderRoomCards(rooms) {
   });
 
   updateRoomCount(rooms.length);
-}
-
-// ============================================================
-// Render: Empty State
-// ============================================================
-
-function renderEmptyState() {
-  gridContainer.innerHTML = `
-    <div class="empty-state" role="status">
-      <div class="empty-state__icon" aria-hidden="true">🏜</div>
-      <p class="empty-state__message">
-        Inga rum matchar dina filter<br>
-        Försök att ändra sökningen.
-      </p>
-      <button class="btn btn-primary" id="empty-clear-filters" type="button">
-        ↻ Rensa alla filter
-      </button>
-    </div>
-  `;
-  // Wire up empty-state clear button
-  const emptyBtn = gridContainer.querySelector('#empty-clear-filters');
-  if (emptyBtn) {
-    emptyBtn.addEventListener('click', () => {
-      clearAllFilters();
-      applyFiltersAndRender();
-    });
-  }
-  updateRoomCount(0);
-}
-
-// ============================================================
-// Render: Error State
-// ============================================================
-
-let lastError = null;
-
-function renderErrorState(message) {
-  lastError = message || 'Kunde inte ladda rum. Kontrollera nätverket och försök igen.';
-  gridContainer.innerHTML = `
-    <div class="empty-state" role="alert">
-      <div class="empty-state__icon" aria-hidden="true">⚠️</div>
-      <p class="empty-state__message">${escapeHtml(lastError)}</p>
-      <button class="btn btn-primary" id="error-retry" type="button">
-        ↻ Försök igen
-      </button>
-    </div>
-  `;
-  const retryBtn = gridContainer.querySelector('#error-retry');
-  if (retryBtn) {
-    retryBtn.addEventListener('click', init);
-  }
-  updateRoomCount('');
 }
 
 // ============================================================

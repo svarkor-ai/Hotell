@@ -4,8 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sea View Hotel — Boka rum med havsvy</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Token-first: design-system (custom properties) must load before components -->
   <link rel="stylesheet" href="/static/css/design-system.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <!-- Components (deterministic alphabetical order) -->
+  <link rel="stylesheet" href="/static/css/components/badges.css">
+  <link rel="stylesheet" href="/static/css/components/buttons.css">
+  <link rel="stylesheet" href="/static/css/components/calendar.css">
+  <link rel="stylesheet" href="/static/css/components/cards.css">
+  <link rel="stylesheet" href="/static/css/components/filters.css">
+  <link rel="stylesheet" href="/static/css/components/footer.css">
+  <link rel="stylesheet" href="/static/css/components/forms.css">
+  <link rel="stylesheet" href="/static/css/components/hero.css">
+  <link rel="stylesheet" href="/static/css/components/loading.css">
+  <link rel="stylesheet" href="/static/css/components/modal.css">
+  <link rel="stylesheet" href="/static/css/components/nav.css">
+  <link rel="stylesheet" href="/static/css/components/table.css">
+  <link rel="stylesheet" href="/static/css/components/toasts.css">
+  <link rel="stylesheet" href="/static/css/responsive.css">
 </head>
 <body>
 
@@ -317,10 +333,15 @@
   </div>
 </footer>
 
-<script src="/static/js/rooms.js"></script>
-<script src="/static/js/bookings.js"></script>
-<script src="/static/js/calendar.js"></script>
-<script src="/static/js/booking-flow.js"></script>
+<!-- Modular JS: utils → ui helpers → view modules → app.js LAST -->
+<script src="/static/js/utils/api.js"></script>
+<script src="/static/js/ui/toasts.js"></script>
+<script src="/static/js/ui/loading.js"></script>
+<script src="/static/js/ui/modal.js"></script>
+<script src="/static/js/ui/render-rooms.js"></script>
+<script src="/static/js/ui/render-bookings.js"></script>
+<script src="/static/js/ui/render-calendar.js"></script>
+<script src="/static/js/ui/booking-flow.js"></script>
 <script src="/static/js/app.js"></script>
 </body>
 </html>

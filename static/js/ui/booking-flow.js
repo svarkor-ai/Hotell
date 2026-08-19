@@ -139,6 +139,7 @@ const bookingFlowModule = (() => {
       </div>
 
       <form id="booking-flow-form" novalidate>
+        <input type="hidden" id="booking-room-id" name="room_id" value="${room.id}">
         <div class="booking-form__fields">
           <div class="form-group booking-form__field-group">
             <label for="bf-guest-name" class="form-label">Namn *</label>
