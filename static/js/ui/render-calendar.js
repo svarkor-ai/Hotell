@@ -1,8 +1,13 @@
 /**
- * render-calendar.js — Calendar Page (Month Grid View)
+ * render-calendar.js — Calendar Page (Room × Date Grid)
  *
- * Renders a month calendar grid showing room availability for each day.
+ * Renders an intuitive booking matrix: one row per room, one column per date.
+ * The first column is a frozen room label; each room×date cell shows whether
+ * the room is available (Ledig) or booked (Bokad) on that night.
+ *
  * Supports month navigation, room type filtering, and today highlighting.
+ * Grid is wrapped in a horizontal-scroll container (.table-wrap) so a full
+ * month stays usable on small screens.
  *
  * Depends on: utils/api.js (API_BASE, apiGet, Endpoints)
  */
@@ -21,9 +26,16 @@ const calendarModule = (() => {
     'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December',
   ];
 
-  const DAY_NAMES = ['Man', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön'];
+  const DAY_NAMES = ['Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön'];
 
-  // ---- Room type colors (from design spec) ----
+  // Room type → display label (Swedish)
+  const ROOM_TYPE_LABELS = {
+    single: 'Enkel',
+    double: 'Dubbel',
+    four_person: 'Fyrasäng',
+  };
+
+  // Room type colors (from design spec)
   const ROOM_TYPE_COLORS = {
     single: { bg: '#e0f2fe', border: '#0369a1', text: '#075985' },   // primary-100/600/700
     double: { bg: '#d1fae5', border: '#047857', text: '#065f46' },   // accent-100/600/700
@@ -61,12 +73,6 @@ const calendarModule = (() => {
     return new Date(year, month, 0).getDate();
   }
 
-  function getFirstDayOfMonth(year, month) {
-    // 0=Sunday, we want 0=Monday
-    const day = new Date(year, month - 1, 1).getDay();
-    return day === 0 ? 6 : day - 1; // Convert to Monday=0
-  }
-
   function formatDate(year, month, day) {
     return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   }
@@ -78,18 +84,56 @@ const calendarModule = (() => {
           now.getDate() === day;
   }
 
-  function isPrevMonthDay(year, month, day) {
-    // For padding days from previous month
-    return day < 7 - getFirstDayOfMonth(year, month);
+  function weekdayIndex(year, month, day) {
+    // 0 = Monday … 6 = Sunday (DAY_NAMES order)
+    const jsDay = new Date(year, month - 1, day).getDay(); // 0 = Sunday
+    return jsDay === 0 ? 6 : jsDay - 1;
   }
 
-  function isNextMonthDay(year, month, day) {
-    const totalDays = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
-    const totalSlots = firstDay + totalDays;
-    const weekNum = Math.floor((firstDay + day - 1) / 7);
-    const currentWeekEnd = weekNum * 7 + 7;
-    return day > totalDays && (firstDay + day - 1) >= totalSlots;
+  // ---- Pure layout: build room × date matrix ----
+  //
+  // Returns { days: [{date, dayNumber, weekday, isToday}], rooms: [{room,
+  // statuses: [{date, available, booking_id}] }] } for the visible month only
+  // (no prev/next padding — a date-column grid has no empty cells).
+  function buildRoomDateMatrix(year, month, data, roomList) {
+    const daysInMonth = getDaysInMonth(year, month);
+
+    const days = [];
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push({
+        date: formatDate(year, month, day),
+        dayNumber: day,
+        weekday: DAY_NAMES[weekdayIndex(year, month, day)],
+        isToday: isToday(year, month, day),
+      });
+    }
+
+    // Lookup: date -> { room_id: { available, booking_id } }
+    const dayLookup = {};
+    (data.days || []).forEach((dayEntry) => {
+      dayLookup[dayEntry.date] = {};
+      Object.entries(dayEntry).forEach(([key, val]) => {
+        if (key.startsWith('room_')) {
+          const roomId = parseInt(key.replace('room_', ''), 10);
+          dayLookup[dayEntry.date][roomId] = val;
+        }
+      });
+    });
+
+    const roomsMatrix = roomList.map((room) => {
+      const statuses = days.map((d) => {
+        const dayData = dayLookup[d.date] || {};
+        const cell = dayData[room.id];
+        return {
+          date: d.date,
+          available: cell ? cell.available : true,
+          booking_id: cell ? cell.booking_id : null,
+        };
+      });
+      return { room, statuses };
+    });
+
+    return { days, rooms: roomsMatrix };
   }
 
   // ---- Rendering: Month Label ----
@@ -98,6 +142,14 @@ const calendarModule = (() => {
     if (label) {
       label.textContent = `${MONTH_NAMES[currentMonth - 1]} ${currentYear}`;
     }
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   // ---- Rendering: Grid ----
@@ -110,114 +162,63 @@ const calendarModule = (() => {
     const selectedType = roomTypeFilter ? roomTypeFilter.value : '';
 
     // Filter rooms by type
-    const filteredRooms = rooms.filter(r => {
+    const filteredRooms = rooms.filter((r) => {
       if (!selectedType) return true;
       return r.room_type === selectedType;
     });
 
     if (filteredRooms.length === 0) {
       container.innerHTML = `
-        <div class="calendar-empty">
-          <div class="calendar-empty__icon">📅</div>
-          <p>Inga rum tillgängliga för valt filter.</p>
+        <div class="calendar-empty" role="status">
+          <div class="calendar-empty__icon" aria-hidden="true">📅</div>
+          <p class="calendar-empty__message">Inga rum tillgängliga för valt filter.</p>
         </div>`;
       return;
     }
 
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
-    const prevMonth = month === 1 ? 12 : month - 1;
-    const prevYear = month === 1 ? year - 1 : year;
-    const daysInPrevMonth = new Date(year, month - 1, 0).getDate();
+    const { days, rooms: roomsMatrix } = buildRoomDateMatrix(year, month, data, filteredRooms);
 
-    // Build a lookup: date string -> { room_id: { available, booking_id } }
-    const dayLookup = {};
-    (data.days || []).forEach(day => {
-      dayLookup[day.date] = {};
-      Object.entries(day).forEach(([key, val]) => {
-        if (key.startsWith('room_')) {
-          const roomId = parseInt(key.replace('room_', ''), 10);
-          dayLookup[day.date][roomId] = val;
-        }
-      });
-    });
-
-    // Build weeks array
-    const weeks = [];
-    let currentWeek = [];
-
-    // Padding from previous month
-    for (let i = 0; i < firstDay; i++) {
-      const day = daysInPrevMonth - firstDay + 1 + i;
-      currentWeek.push({
-        type: 'prev',
-        day,
-        date: formatDate(prevYear, prevMonth, day),
-        roomData: {},
-      });
-    }
-
-    // Days in current month
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = formatDate(year, month, day);
-      currentWeek.push({
-        type: 'current',
-        day,
-        date: dateStr,
-        roomData: dayLookup[dateStr] || {},
-        isTodayFlag: isToday(year, month, day),
-      });
-    }
-
-    // Padding for next month to complete last week
-    while (currentWeek.length < 7) {
-      const day = currentWeek.length - firstDay + 1;
-      const nextMonth = month === 12 ? 1 : month + 1;
-      const nextYear = month === 12 ? year + 1 : year;
-      currentWeek.push({
-        type: 'next',
-        day,
-        date: formatDate(nextYear, nextMonth, day),
-        roomData: {},
-      });
-    }
-
-    weeks.push(currentWeek);
-
-    // Render rows
+    // --- Header row: corner label + one column per date ---
     let html = '<div class="calendar-grid__header" role="row">';
-    DAY_NAMES.forEach(d => {
-      html += `<div class="calendar-grid__header-cell" role="columnheader">${d}</div>`;
+    html += '<div class="calendar-grid__header-corner" role="columnheader" aria-label="Rum">Rum</div>';
+    days.forEach((d) => {
+      const todayCls = d.isToday ? ' is-today' : '';
+      html +=
+        `<div class="calendar-grid__header-cell${todayCls}" role="columnheader" aria-label="${d.date}">` +
+          `<span class="calendar-grid__header-weekday">${d.weekday}</span>` +
+          `<span class="calendar-grid__header-day">${d.dayNumber}</span>` +
+        `</div>`;
     });
     html += '</div>';
+
+    // --- Body: one row per room ---
     html += '<div class="calendar-grid__body" role="rowgroup">';
 
-    weeks.forEach((week, weekIdx) => {
+    roomsMatrix.forEach(({ room, statuses }) => {
+      const color = ROOM_TYPE_COLORS[room.room_type] || ROOM_TYPE_COLORS.single;
+      const typeLabel = ROOM_TYPE_LABELS[room.room_type] || '';
+      const roomTitle = `Rum ${room.room_number}${typeLabel ? ` (${typeLabel})` : ''}`;
+
       html += `<div class="calendar-grid__row" role="row">`;
-      week.forEach(dayInfo => {
-        const cellClass = ['calendar-grid__cell'];
-        if (dayInfo.type === 'prev') cellClass.push('calendar-grid__cell--prev');
-        if (dayInfo.type === 'next') cellClass.push('calendar-grid__cell--next');
-        if (dayInfo.isTodayFlag) cellClass.push('calendar-grid__cell--today');
+      html +=
+        `<div class="calendar-grid__row-label" role="rowheader" style="--room-accent:${color.border}">` +
+          `<span class="calendar-grid__row-room">${escapeHtml(room.room_number)}</span>` +
+          `<span class="calendar-grid__row-type">${escapeHtml(typeLabel)}</span>` +
+        `</div>`;
 
-        // Build room status cells for this day
-        let roomStatuses = filteredRooms.map(room => {
-          const color = ROOM_TYPE_COLORS[room.room_type] || ROOM_TYPE_COLORS.single;
-          const dayData = dayInfo.roomData[room.id];
-          const available = dayData ? dayData.available : true;
-          const booked = dayData ? !dayData.available : false;
-
-          return `<div class="calendar-grid__room-slot ${booked ? 'calendar-grid__room-slot--booked' : 'calendar-grid__room-slot--available'}"
-                        style="background:${color.bg}; border-left: 3px solid ${color.border}"
-                        title="Rum ${room.room_number}: ${booked ? 'Bokad' : 'Ledig'}">
-          </div>`;
-        }).join('');
-
-        html += `<div class="${cellClass.join(' ')}" role="gridcell" data-date="${dayInfo.date}">
-          <span class="calendar-grid__cell-day">${dayInfo.day}</span>
-          <div class="calendar-grid__cell-rooms">${roomStatuses}</div>
-        </div>`;
+      statuses.forEach((cell) => {
+        const stateCls = cell.available
+          ? 'calendar-grid__cell--available'
+          : 'calendar-grid__cell--booked';
+        const title = cell.available
+          ? `Rum ${room.room_number} ledigt ${cell.date}`
+          : `Rum ${room.room_number} bokat ${cell.date}`;
+        html +=
+          `<div class="calendar-grid__cell ${stateCls}" role="gridcell" data-date="${cell.date}" aria-label="${title}" title="${title}">` +
+            `<span class="sr-only">${cell.available ? 'Ledigt' : 'Bokat'}</span>` +
+          `</div>`;
       });
+
       html += '</div>';
     });
 
@@ -232,7 +233,7 @@ const calendarModule = (() => {
 
     const roomTypeFilter = document.getElementById('filter-room-type');
     const selectedType = roomTypeFilter ? roomTypeFilter.value : '';
-    const filteredRooms = rooms.filter(r => {
+    const filteredRooms = rooms.filter((r) => {
       if (!selectedType) return true;
       return r.room_type === selectedType;
     });
@@ -242,22 +243,14 @@ const calendarModule = (() => {
       return;
     }
 
-    container.innerHTML = filteredRooms.map(room => {
+    container.innerHTML = filteredRooms.map((room) => {
       const color = ROOM_TYPE_COLORS[room.room_type] || ROOM_TYPE_COLORS.single;
-      return `<div class="calendar-legend__item" title="Rum ${room.room_number} (${room.room_type})">
-        <span class="calendar-legend__dot" style="background:${color.border}"></span>
-        <span class="calendar-legend__label">Rum ${room.room_number}</span>
+      const typeLabel = ROOM_TYPE_LABELS[room.room_type] || room.room_type;
+      return `<div class="calendar-legend__item" title="Rum ${room.room_number} (${escapeHtml(typeLabel)})">
+        <span class="calendar-legend__dot" style="background:${color.border}" aria-hidden="true"></span>
+        <span class="calendar-legend__label">Rum ${escapeHtml(room.room_number)}</span>
       </div>`;
     }).join('');
-  }
-
-  // ---- Rendering: Today Highlight ----
-  function highlightToday() {
-    const todayCell = document.querySelector('.calendar-grid__cell--today');
-    if (todayCell) {
-      todayCell.style.outline = `2px solid var(--color-primary-600)`;
-      todayCell.style.outlineOffset = `2px`;
-    }
   }
 
   // ---- Month Navigation ----
@@ -286,13 +279,13 @@ const calendarModule = (() => {
     const data = await fetchCalendar(currentYear, currentMonth);
     updateMonthLabel();
     renderCalendarGrid(currentYear, currentMonth, data);
-    highlightToday();
     renderRoomLegend();
   }
 
   // ---- Public API ----
   function getCurrentYear() { return currentYear; }
   function getCurrentMonth() { return currentMonth; }
+  function getDaysInMonthPublic(y, m) { return getDaysInMonth(y, m); }
 
   // ---- Initialization ----
   function init() {
@@ -301,24 +294,21 @@ const calendarModule = (() => {
     const nextBtn = document.getElementById('cal-next-month');
     const todayBtn = document.getElementById('cal-today');
 
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => navigateMonth(-1));
-    }
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => navigateMonth(1));
-    }
-    if (todayBtn) {
-      todayBtn.addEventListener('click', goToday);
-    }
+    if (prevBtn) prevBtn.addEventListener('click', () => navigateMonth(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => navigateMonth(1));
+    if (todayBtn) todayBtn.addEventListener('click', goToday);
 
     // Room type filter
     const roomTypeFilter = document.getElementById('filter-room-type');
-    if (roomTypeFilter) {
-      roomTypeFilter.addEventListener('change', () => loadCalendar());
-    }
+    if (roomTypeFilter) roomTypeFilter.addEventListener('change', () => loadCalendar());
 
-    // Load initial data
-    loadCalendar();
+    // Initial data (whitespace in this element is stripped; safe to re-render)
+    const wrapper = document.getElementById('calendar-weeks');
+    if (wrapper) wrapper.setAttribute('aria-busy', 'true');
+
+    loadCalendar().finally(() => {
+      if (wrapper) wrapper.setAttribute('aria-busy', 'false');
+    });
   }
 
   return {
@@ -328,5 +318,7 @@ const calendarModule = (() => {
     goToday,
     getCurrentYear,
     getCurrentMonth,
+    buildRoomDateMatrix,
+    getDaysInMonth: getDaysInMonthPublic,
   };
 })();

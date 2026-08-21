@@ -1,137 +1,207 @@
-/* ---- 3.6 Calendar Grid ---- */
+/* ---- 3.6 Calendar Grid — Room × Date ---- *
+ * Booking matrix: one row per room, one column per date.
+ * The corner label (first column) is a frozen room label; each room×date
+ * intersection shows available/booked. Rows and header share a single CSS
+ * grid so every column aligns across the whole month.
+ *
+ * Column count is fixed at the max month length (31) so the layout is stable
+ * between months; the header/row wrappers use display:contents so their cells
+ * lay out directly in the shared grid.
+ */
+
 .calendar-grid {
+  --cal-room-w: clamp(100px, 9rem, 148px);
+  --cal-cell-w: clamp(30px, 4.4vw, 46px);
+  position: relative;
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-4);
-}
-
-.calendar-day-card {
-  background: var(--color-surface);
+  grid-template-columns: var(--cal-room-w) repeat(31, var(--cal-cell-w));
+  gap: 1px;
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xs);
-  padding: var(--space-4);
 }
 
-.calendar-day-card__date {
-  font-size: var(--heading-5);
-  color: var(--color-primary-800);
-  margin-bottom: var(--space-3);
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--color-border);
+/* Header and each room row join the shared grid (no own box). */
+.calendar-grid__header,
+.calendar-grid__body,
+.calendar-grid__row {
+  display: contents;
 }
 
-.calendar-day-card__slots {
+/* ---- Header row ---- */
+.calendar-grid__header-corner,
+.calendar-grid__header-cell {
   display: flex;
   flex-direction: column;
-  gap: 0;
-}
-
-.slot {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--color-neutral-100);
+  justify-content: center;
+  gap: var(--space-0-5);
+  padding: var(--space-2) var(--space-0-5);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  line-height: var(--leading-tight);
+  min-height: 2.75rem;
 }
 
-.slot:last-child {
-  border-bottom: none;
-}
-
-.slot__room {
-  font-weight: var(--font-medium);
-}
-
-.slot__status {
+.calendar-grid__header-corner {
+  background: var(--color-surface-alt);
   font-weight: var(--font-semibold);
+  color: var(--color-text-muted);
+  align-items: flex-start;
+  padding-left: var(--space-3);
+  justify-content: center;
 }
 
-.slot.available .slot__status {
-  color: var(--color-success);
+.calendar-grid__header-cell {
+  font-weight: var(--font-medium);
+  color: var(--color-text-muted);
 }
 
-.slot.booked .slot__status {
-  color: var(--color-error);
+.calendar-grid__header-weekday {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-/* Calendar legend */
+.calendar-grid__header-day {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+/* Today heading */
+.calendar-grid__header-cell.is-today {
+  background: var(--color-primary-100);
+  color: var(--color-primary-800);
+}
+.calendar-grid__header-cell.is-today .calendar-grid__header-day {
+  color: var(--color-primary-800);
+}
+
+/* ---- Room label column ---- */
+.calendar-grid__row-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-alt);
+  border-left: 3px solid var(--room-accent, var(--color-primary-500));
+  font-size: var(--text-sm);
+  line-height: var(--leading-tight);
+  min-height: 2.5rem;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.calendar-grid__row-room {
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.calendar-grid__row-type {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* ---- Room × date cells ---- */
+.calendar-grid__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  background: var(--color-surface);
+  cursor: default;
+}
+
+.calendar-grid__cell--available {
+  background: var(--color-success-bg);
+}
+.calendar-grid__cell--booked {
+  background: var(--color-error-bg);
+}
+
+/* Visible focus on cells for keyboard users */
+.calendar-grid__cell:focus {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: -2px;
+}
+
+/* ---- Empty / loading states ---- */
+.calendar-empty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+  background: var(--color-surface);
+}
+
+.calendar-empty__icon {
+  font-size: 2.5rem;
+  opacity: 0.6;
+}
+
+.calendar-empty__message {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  line-height: var(--leading-normal);
+}
+
+/* ---- Legend ---- */
 .calendar-legend {
   display: flex;
-  gap: var(--space-6);
+  gap: var(--space-4);
   flex-wrap: wrap;
+  align-items: center;
   margin-top: var(--space-4);
   padding: var(--space-3) 0;
   font-size: var(--text-sm);
 }
 
-.legend-item {
-  display: flex;
+.calendar-legend__item {
+  display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  color: var(--color-text-secondary);
 }
 
-.legend-dot {
+.calendar-legend__dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   display: inline-block;
 }
 
-.legend-dot--available {
-  background: var(--color-success);
+.calendar-legend__label {
+  font-weight: var(--font-medium);
 }
 
-.legend-dot--booked {
-  background: var(--color-error);
+/* ---- Loading state whilst data is fetched ---- */
+.calendar-grid[aria-busy="true"] {
+  opacity: 0.55;
+  transition: opacity var(--transition-fast);
 }
 
-  body.dark-mode .calendar-grid {
-   background: var(--color-bg-card);
-  }
-
-  body.dark-mode .calendar-day,
-  body.dark-mode .calendar-weekday {
-   background: var(--color-bg-card);
-   border-color: var(--color-border);
-   color: var(--color-text-primary);
-  }
-
-  body.dark-mode .calendar-day:hover {
-   background: var(--color-bg-tertiary);
-  }
-
-  body.dark-mode .calendar-day.is-today {
-   border-color: var(--color-primary-400);
-   background: var(--color-bg-tertiary);
-  }
-
-  body.dark-mode .calendar-day.is-booked {
-   background: var(--color-error-100);
-  }
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+/* ---- Dark mode ---- */
+body.dark-mode .calendar-grid {
+  background: var(--color-border);
 }
 
-.calendar-day {
-  background: white;
-  border-radius: 8px;
-  padding: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  font-size: 0.9rem;
+body.dark-mode .calendar-grid__header-corner,
+body.dark-mode .calendar-grid__row-label {
+  background: var(--color-surface-alt);
 }
 
-.calendar-day .date { font-weight: 700; color: #0c4a6e; margin-bottom: 0.5rem; }
-
-.slot {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.3rem 0;
-  border-bottom: 1px solid #f3f4f6;
+body.dark-mode .calendar-grid__cell--available {
+  background: var(--color-success-bg);
 }
 
-.slot .room-name { font-weight: 500; }
-.slot.available { color: #059669; }
-.slot.booked { color: #dc2626; }
+body.dark-mode .calendar-grid__cell--booked {
+  background: var(--color-error-bg);
+}
