@@ -7,13 +7,24 @@
  * Column count is fixed at the max month length (31) so the layout is stable
  * between months; the header/row wrappers use display:contents so their cells
  * lay out directly in the shared grid.
+ *
+ * The date tracks are written as 32 EXPLICIT <track-breadth> values (1 frozen
+ * room label + 31 date columns) rather than repeat(31, …). A repeat() whose
+ * repetition factor must resolve against track sizes can be rejected on strict
+ * engines, collapsing the matrix to a few columns; a fully explicit, flat list
+ * of valid minmax() breadths has no such fallback path, so all 32 columns
+ * align on every engine.
  */
 
 .calendar-grid {
   --cal-room-w: clamp(100px, 9rem, 148px);
   position: relative;
   display: grid;
-  grid-template-columns: var(--cal-room-w) repeat(31, minmax(30px, 1fr));
+  grid-template-columns: var(--cal-room-w)
+    minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr)
+    minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr)
+    minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr)
+    minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr) minmax(30px, 1fr);
   gap: 1px;
   background: var(--color-border);
   border: 1px solid var(--color-border);
