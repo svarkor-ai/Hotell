@@ -1,15 +1,7 @@
-# LEDGER — Hotell shoppable demo (parent MC#80)
-
-**Goal:** Make the Hotell repo a fully functional, shippable, shoppable hotel booking demo per the repo specs (no IoT).
-**DoD:** spec §12 (16 success metrics) verified + app reachable in a browser (hosting).
-
-## Module status
-- [x] T1 Spec verification (§12) — svarkor ran it directly (board refuses a standalone dobbie verify card without onfail; verifying returned work is my verify discipline). **16/16 metrics PASS** (VERIFIED this session).
-- [x] App functional on local port **8501** — /health, /api/rooms/ (4), /api/bookings/, /api/calendar/ all 200; book + cancel + double-book-400 all VERIFIED. Demo DB clean (only Anna Andersson booking).
-- [ ] T2 Hosting on vm106 — gunilla card **80.1** (queued, waiting runner cron). Git-mediated-app-hosting pipeline.
-
-## Open questions
-- None blocking code. Hosting landning pending.
-
-## Notes
-- Port 8000 is owned by chromadb — cannot use it for the app (gunilla's 2026-08-12 unit file was therefore never installed at 8000; correct route is the vm106 git pipeline, port range 8100-8199).
+# LEDGER — Hotell shoppable demo (parents 142, 242, 264, 276)
+Goal: spec §12 (16 metrics) + browser-shopable.
+- [x] Design/API/cache fixes landed + live (rooms load, VERIFIED)
+- [x] Calendar rebuilt as room×date matrix (Nicke 276.1) + cross-engine explicit-grid fix (276.2/276.3) — INTEGRATED, MASTER PUSHED = 0af6206 (VERIFIED)
+- [x] Calendar DEPLOY to hosting main + ?v=0af6206 cache-bust — 276.4 [seat:gunilla] filed → LIVE /hotell/ shows rebuilt booking matrix (verified this session: calendar.css?v=0af6206 = 217 lines explicit 32 tracks, render-calendar.js = 200, all assets cache-busted).
+- [x] Room-IMAGE fix (PARENT 515, [relayed]): all 4 rooms show 4 DISTINCT real photos — fixed four_person→`four-person-room.jpg` hyphen bug (301 was placeholder) + un-shared double photo (102 → new double-room-2.jpg). Commit d0f57e9 pushed master. CODE VERIFIED via vision (2026-08-24): 201 interior / 101 white-linens / 102 tufted-headboard / 301 terrace, all distinct real, all 200.
+- [x] Deploy-REGRESSION & fix (PARENT 547, [relayed]): initial deploy 336be1c copied raw source and DROPPED the /hotell subpath-prefix → room grid 404 (fetch /api/rooms/ at root). Re-fixed source to /hotell (d21f4fc: API_BASE='/hotell', API_ROOMS_URL='/hotell/api/rooms/', app.js API='/hotell'), redeployed ad17229 preserving prefix, cache-bust →?v=d21f4fc. LIVE RE-VERIFIED this session (browser render + vision): all 4 rooms render, no error state, 4 distinct photos. master=source-of-truth pushed d0f57e9+d21f4fc origin/master.
