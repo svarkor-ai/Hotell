@@ -50,5 +50,11 @@ vm106:s pull-timer renderar systemd-unit `vm106-app-hotell.service` + nginx-loca
 `/hotell/` → proxy till `127.0.0.1:8117`. Se `apps/hotell/` för den deployade kopian.
 
 ## Demo-data
-`.data/hotel.db` innehåller 4 rum (101/102 dubbel, 201 enkel, 301 fyrbädds) och en bekräftad
-demo-bokning (Anna Andersson, rum 101, 2026-09-01→05).
+Vid start seedas 4 rum idempotent (`app/seed.py`): 101/102 dubbel, 201 enkel, 301 fyrbädds
+— alla med havsutsikt. Inga bokningar är förseedade; databasen (`.data/hotel.db`) börjar tom
+på bokningar och fylls när du bokar i demon.
+
+## Hosting-entrypoint
+`server.py` är produktionsentrypointen för vm106-hostingen: den binder `0.0.0.0:$PORT`
+(default 8117, se `hosting.yaml`) och kör `app.main:app` utan reload. `run.py` (port 8000,
+reload) är endast för lokal utveckling.
