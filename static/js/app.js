@@ -4,7 +4,7 @@
 // Global API base used by modules that still reference `${API}` directly
 // (e.g. booking-flow.js). Kept here so the orchestrator remains the single
 // owner of shared bootstrap globals.
-const API = "";
+const API = "/hotell";
 
 // ============================================================================
 // Navigation

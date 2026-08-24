@@ -8,7 +8,7 @@
 //
 // Depends on nothing.
 
-const API_BASE = '';
+const API_BASE = '/hotell';
 
 /**
  * Perform a GET request against the API.
