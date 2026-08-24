@@ -33,6 +33,29 @@ const AMENITIES = {
   four_person: ['Havsvy', 'WiFi', 'TV', 'Minikök', 'Luftkonditionering', 'Skrivbord', 'Extra badrum'],
 };
 
+// Per-room photo map, keyed by room_number. room_type is NOT unique (rooms 101
+// and 102 are both `double`), so photo files are resolved per room to guarantee
+// every demo room shows its own distinct real photo. The fallback below maps
+// any other room to its type-based file with underscores normalised to hyphens,
+// matching the on-disk filenames (e.g. four_person -> four-person-room.jpg).
+const ROOM_IMAGE_FILES = {
+  '101': 'double-room.jpg',
+  '102': 'double-room-2.jpg',
+  '201': 'single-room.jpg',
+  '301': 'four-person-room.jpg',
+};
+
+/**
+ * Resolve the static photo for a room.
+ * @param {Object} room - Room object (room_number, room_type)
+ * @returns {string} URL path to the room's photo
+ */
+function roomImagePath(room) {
+  const file = ROOM_IMAGE_FILES[String(room.room_number)]
+    || `${String(room.room_type).replace(/_/g, '-')}-room.jpg`;
+  return `/static/images/rooms/${file}`;
+}
+
 // Default sort
 const DEFAULT_SORT = 'price-asc';
 
@@ -177,7 +200,7 @@ function renderRoomCard(room) {
     ? '1 person'
     : `${room.capacity} personer`;
 
-  const imgPath = `/static/images/rooms/${room.room_type}-room.jpg`;
+  const imgPath = roomImagePath(room);
   return `
     <article class="room-card" role="button" tabindex="0"
              data-room-id="${room.id}"
@@ -283,7 +306,7 @@ function openRoomDetail(room) {
       </div>
     `).join('');
 
-  const imgPath = `/static/images/rooms/${room.room_type}-room.jpg`;
+  const imgPath = roomImagePath(room);
 
   dialog.innerHTML = `
     <div class="room-detail__image" style="background: linear-gradient(135deg, ${typeColor}40 0%, ${typeColor}80 50%, ${typeColor} 100%);">
