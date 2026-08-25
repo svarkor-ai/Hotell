@@ -22,6 +22,10 @@ seed_rooms(SessionLocal())
 
 app = FastAPI(title=settings.APP_NAME, version="0.1.0")
 
+# MC 2034.2 — public demo: per-visitor rate limit on mutating requests.
+from app.demo_guard import DemoWriteGuard
+app.add_middleware(DemoWriteGuard)
+
 # Serve static files (CSS, JS, images)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
