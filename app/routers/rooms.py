@@ -86,6 +86,14 @@ def create_room(room: RoomCreate, db: Session = Depends(get_db)):
     return db_room
 
 
+@router.get("/{room_id}", response_model=RoomOut)
+def get_room(room_id: int, db: Session = Depends(get_db)):
+    room = db.query(Room).filter(Room.id == room_id).first()
+    if not room:
+        raise HTTPException(404, "Room not found")
+    return room
+
+
 @router.post("/{room_id}/book", response_model=BookingOut)
 def book_room(room_id: int, booking: BookingRequest, db: Session = Depends(get_db)):
     room = db.query(Room).filter(Room.id == room_id).first()
