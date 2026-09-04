@@ -57,3 +57,13 @@ def test_get_room_returns_404_for_unknown_id(client):
     resp = client.get("/api/rooms/9999/")
     assert resp.status_code == 404
     assert resp.json()["detail"] == "Room not found"
+
+
+def test_get_room_without_trailing_slash_redirects(client):
+    # The decorator now carries a trailing slash, so the no-slash form 307-redirects
+    # (TestClient follows redirects) to the trailing-slash form and still resolves.
+    # Without a valid redirect target this would 404 and the modal would show "undefined".
+    resp = client.get("/api/rooms/1")
+    assert resp.status_code == 200
+    assert resp.json()["id"] == 1
+    assert resp.json()["room_number"] == "101"
