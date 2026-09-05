@@ -289,8 +289,9 @@ const bookingFlowModule = (() => {
 
     try {
       const booking = await submitBooking(currentRoom.id, data);
+      const roomNumber = currentRoom ? currentRoom.room_number : null;
       closeModal();
-      showSuccess(booking);
+      showSuccess(booking, roomNumber);
       // Refresh bookings table if it's open
       if (typeof bookingsModule !== 'undefined' && bookingsModule.loadBookings) {
         bookingsModule.loadBookings();
@@ -342,7 +343,7 @@ const bookingFlowModule = (() => {
   }
 
   // ---- Success/Error ----
-  function showSuccess(booking) {
+  function showSuccess(booking, roomNumber) {
     const modal = document.getElementById('booking-modal');
     const body = document.getElementById('booking-modal-body');
 
@@ -356,7 +357,7 @@ const bookingFlowModule = (() => {
         <div class="booking-success__details">
           <div class="booking-success__detail-row">
             <span class="booking-success__detail-label">Rum:</span>
-            <span class="booking-success__detail-value">Rum ${currentRoom ? currentRoom.room_number : '—'}</span>
+            <span class="booking-success__detail-value">Rum ${roomNumber || '—'}</span>
           </div>
           <div class="booking-success__detail-row">
             <span class="booking-success__detail-label">Incheckning:</span>
