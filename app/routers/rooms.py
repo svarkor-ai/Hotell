@@ -100,8 +100,14 @@ def book_room(room_id: int, booking: BookingRequest, db: Session = Depends(get_d
     if not room:
         raise HTTPException(404, "Room not found")
 
-    ci = datetime.strptime(booking.check_in, "%Y-%m-%d").date()
-    co = datetime.strptime(booking.check_out, "%Y-%m-%d").date()
+    try:
+        ci = datetime.strptime(booking.check_in, "%Y-%m-%d").date()
+        co = datetime.strptime(booking.check_out, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(400, "Ogiltigt datumformat, använd YYYY-MM-DD")
+
+    if co <= ci:
+        raise HTTPException(400, "Utcheckning måste vara efter incheckning")
 
     overlaps = db.query(Booking).filter(
         Booking.room_id == room_id,
