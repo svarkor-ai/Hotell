@@ -18,6 +18,15 @@ const bookingsModule = (() => {
     completed: 'Slutförd',
   };
 
+  // ---- XSS guard (audit F2, MC 1290.2) ----
+  // Same escapeHtml pattern as render-rooms.js: API-stored strings (guest
+  // name/email) are user-controlled and MUST be escaped at render time.
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
   // ---- API ----
   async function fetchBookings() {
     try {
@@ -113,13 +122,17 @@ const bookingsModule = (() => {
 
   // ---- Rendering: Single Row ----
   function renderBookingRow(booking) {
-    const guest = booking.guest_name.length > 25
-      ? booking.guest_name.slice(0, 25) + '…'
-      : booking.guest_name;
+    // Audit F2: guest_name is user-controlled — escape before it touches
+    // innerHTML (both the title attribute and the cell text).
+    const rawName = String(booking.guest_name || '');
+    const guest = rawName.length > 25
+      ? escapeHtml(rawName.slice(0, 25)) + '…'
+      : escapeHtml(rawName);
+    const guestTitle = escapeHtml(rawName);
 
     return `<tr data-booking-id="${booking.id}">
       <td>#${booking.id}</td>
-      <td title="${booking.guest_name}">${guest}</td>
+      <td title="${guestTitle}">${guest}</td>
       <td>Rum ${booking.room_id}</td>
       <td>
         <div class="date-range">
@@ -191,6 +204,8 @@ const bookingsModule = (() => {
     const booking = allBookings.find(b => b.id === bookingId);
     if (!booking) return;
 
+    // Audit F2: textContent assignment (not innerHTML) — no escaping needed
+    // here, but keep the truncation consistent with the table row.
     const guestName = booking.guest_name.length > 25
       ? booking.guest_name.slice(0, 25) + '…'
       : booking.guest_name;

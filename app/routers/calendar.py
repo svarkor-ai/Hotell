@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Dict, Optional
 from app.database import get_db
@@ -8,6 +8,18 @@ from pydantic import BaseModel
 from datetime import date, timedelta
 
 router = APIRouter(prefix="/api/calendar", tags=["calendar"])
+
+# Audit F3 (MC 1290.2): absurd years overflow date() -> unhandled ValueError
+# -> HTTP 500. Bound the year to something date() can represent and reject
+# months outside 1..12 with a 400 instead.
+MIN_YEAR, MAX_YEAR = 1, 9999
+
+
+def _validate_year_month(year: int, month: int) -> None:
+    if not (MIN_YEAR <= year <= MAX_YEAR):
+        raise HTTPException(400, f"År måste vara mellan {MIN_YEAR} och {MAX_YEAR}")
+    if not (1 <= month <= 12):
+        raise HTTPException(400, "Månad måste vara mellan 1 och 12")
 
 
 class DaySlot(BaseModel):
@@ -28,7 +40,7 @@ def room_calendar(
     year: int, month: int, room_id: int,
     db: Session = Depends(get_db)
 ):
-    from datetime import datetime
+    _validate_year_month(year, month)
     start = date(year, month, 1)
     if month == 12:
         end = date(year + 1, 1, 1)
@@ -82,7 +94,7 @@ def month_calendar(
     year: int, month: int,
     db: Session = Depends(get_db)
 ):
-    from datetime import datetime
+    _validate_year_month(year, month)
     start = date(year, month, 1)
     if month == 12:
         end = date(year + 1, 1, 1)
