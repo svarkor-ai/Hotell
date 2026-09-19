@@ -12,6 +12,15 @@ const bookingFlowModule = (() => {
   let currentRoom = null;
   let isSubmitting = false;
 
+  // ---- XSS guard (audit F2, MC 1290.2) ----
+  // Same escapeHtml pattern as render-rooms.js: API-stored strings (guest
+  // name/email) are user-controlled and MUST be escaped at render time.
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
   // ---- Swedish error messages ----
   const ERR_MESSAGES = {
     missingRoom: 'Välj ett rum.',
@@ -372,7 +381,7 @@ const bookingFlowModule = (() => {
             <span class="booking-success__detail-value">${formatPrice(booking.total_price)} kr</span>
           </div>
         </div>
-        <p class="booking-success__note">En bekräftelse har skickats till ${booking.guest_email}.</p>
+        <p class="booking-success__note">En bekräftelse har skickats till ${escapeHtml(booking.guest_email)}.</p>
       </div>
     `;
 

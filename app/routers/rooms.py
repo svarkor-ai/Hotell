@@ -6,6 +6,7 @@ from app.models.room import Room
 from app.models.booking import Booking
 from pydantic import BaseModel
 from datetime import date, datetime
+import re
 
 router = APIRouter(prefix="/api/rooms", tags=["rooms"])
 
@@ -17,6 +18,17 @@ class RoomCreate(BaseModel):
     price_per_night: int
     sea_view: bool = True
     description: str = ""
+
+
+# Audit F5 (MC 1290.2): simple server-side validation, PoC scope.
+_EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+
+
+def _validate_guest(name: str, email: str) -> None:
+    if not name or not name.strip():
+        raise HTTPException(400, "Gästnamn får inte vara tomt")
+    if not email or not _EMAIL_RE.match(email.strip()):
+        raise HTTPException(400, "Ogiltig e-postadress")
 
 
 class RoomOut(BaseModel):
@@ -76,6 +88,13 @@ def list_rooms(db: Session = Depends(get_db), sea_view_only: bool = False):
 
 @router.post("/", status_code=201)
 def create_room(room: RoomCreate, db: Session = Depends(get_db)):
+    # Audit F5: reject empty room_number, non-positive price, capacity < 1.
+    if not room.room_number or not room.room_number.strip():
+        raise HTTPException(400, "Rumnummer får inte vara tomt")
+    if room.price_per_night <= 0:
+        raise HTTPException(400, "Pris per natt måste vara positivt")
+    if room.capacity < 1:
+        raise HTTPException(400, "Kapacitet måste vara minst 1")
     existing = db.query(Room).filter(Room.room_number == room.room_number).first()
     if existing:
         raise HTTPException(400, f"Room {room.room_number} already exists")
@@ -99,6 +118,9 @@ def book_room(room_id: int, booking: BookingRequest, db: Session = Depends(get_d
     room = db.query(Room).filter(Room.id == room_id).first()
     if not room:
         raise HTTPException(404, "Room not found")
+
+    # Audit F5: server-side guest validation (frontend checks are not enough).
+    _validate_guest(booking.guest_name, booking.guest_email)
 
     try:
         ci = datetime.strptime(booking.check_in, "%Y-%m-%d").date()

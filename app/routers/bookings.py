@@ -48,9 +48,11 @@ def list_bookings(
     db: Session = Depends(get_db),
 ):
     q = db.query(Booking)
-    if status:
+    # Audit F7: use `is not None`, not truthiness — room_id=0 and status=""
+    # are valid filter values and must not be skipped.
+    if status is not None:
         q = q.filter(Booking.status == status)
-    if room_id:
+    if room_id is not None:
         q = q.filter(Booking.room_id == room_id)
     return [_to_dict(b) for b in q.order_by(Booking.check_in.desc()).all()]
 

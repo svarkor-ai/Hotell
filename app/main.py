@@ -12,8 +12,10 @@ from app.seed import seed_rooms
 
 settings = get_settings()
 
-# Ensure data directory exists
-os.makedirs("data", exist_ok=True)
+# Ensure data directory exists — same path the DB_URL in app/config.py uses
+# (MC 1290.2 / audit F1: was "data" while config points at ./.data/hotel.db,
+# so a fresh clone crashed on boot with sqlite3.OperationalError).
+os.makedirs(".data", exist_ok=True)
 
 Base.metadata.create_all(bind=engine)
 # Idempotently seed the four demo rooms so the site is shoppable on a fresh

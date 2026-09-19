@@ -41,6 +41,11 @@ def client(tmp_path):
     app.user_middleware[:] = [
         m for m in app.user_middleware if m.cls is not DemoWriteGuard
     ]
+    # Audit F4 (MC 1290.2): Starlette caches app.middleware_stack on the first
+    # request; without resetting it, removing DemoWriteGuard from
+    # user_middleware has no effect if another test module already made a
+    # request -> order-dependent 429s. Reset so the middleware list is rebuilt.
+    app.middleware_stack = None
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
