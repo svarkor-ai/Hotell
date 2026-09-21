@@ -8,7 +8,11 @@
 //
 // Depends on nothing.
 
-const API_BASE = '/hotell';
+// Base path derived from the served index.html URL, so BOTH serving modes
+// work: bare (app at /, baseURI "http://host/" -> API_BASE "") and prefixed
+// (mounted under a path prefix, nginx strips the prefix, baseURI
+// "http://host/<prefix>/" -> API_BASE "/<prefix>"). Audit F9 (MC 1310.1).
+const API_BASE = new URL('.', document.baseURI).pathname.replace(/\/$/, '');
 
 /**
  * Perform a GET request against the API.
