@@ -128,6 +128,12 @@ def book_room(room_id: int, booking: BookingRequest, db: Session = Depends(get_d
     except ValueError:
         raise HTTPException(400, "Ogiltigt datumformat, använd YYYY-MM-DD")
 
+    # Audit F8 (MC 1310.1): server-side past-date validation. The frontend
+    # blocks past dates, but the API must not trust that — reject check-ins
+    # before today (local date) with 422.
+    if ci < date.today():
+        raise HTTPException(422, "Incheckningsdatum kan inte ligga i förfluten tid")
+
     if co <= ci:
         raise HTTPException(400, "Utcheckning måste vara efter incheckning")
 

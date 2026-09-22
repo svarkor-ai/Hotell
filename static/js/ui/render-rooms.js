@@ -12,7 +12,9 @@
 // Constants
 // ============================================================
 
-const API_ROOMS_URL = '/hotell/api/rooms/';
+// Derived from API_BASE (set in utils/api.js, loaded before this module) so
+// both bare (/) and prefixed (path-prefix) serving modes resolve. Audit F9.
+const API_ROOMS_URL = API_BASE + Endpoints.rooms;
 
 const ROOM_TYPE_LABELS = {
   single: 'Enkel',
@@ -53,7 +55,7 @@ const ROOM_IMAGE_FILES = {
 function roomImagePath(room) {
   const file = ROOM_IMAGE_FILES[String(room.room_number)]
     || `${String(room.room_type).replace(/_/g, '-')}-room.jpg`;
-  return `/hotell/static/images/rooms/${file}`;
+  return `${API_BASE}/static/images/rooms/${file}`;
 }
 
 // Default sort
